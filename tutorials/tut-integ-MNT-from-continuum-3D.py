@@ -1,0 +1,139 @@
+#-------------------------------------------------------------------------------
+# Name:        tut-integ-MNT-from-continuum-3D
+# Purpose:     compute and plot MNT diagrams for a beam discretized using B8 elements (continuum for structures)
+#
+# Author:      Andrzej Truty
+#
+# Created:     2020
+# Copyright:   (c) ZACE Services Ltd 2020
+# Licence:     <your licence>
+#-------------------------------------------------------------------------------
+import matplotlib.pyplot  as pyplot
+import matplotlib.pylab   as pylab
+from math import *
+import xlwt
+import sys,os
+
+#miktex is needed to use the following package
+from matplotlib import rc
+# those who have installed miktex environment can deactivate the next statement to have nice
+# Latex style axes descriptions, equations etc...
+#rc('text',usetex=True)
+
+
+#path to SDK
+sys.path.append ('..\\')
+
+from C_Mesh import *
+from C_HistoryOfExecution import *
+from C_Rcf_info import *
+from C_EleResults import *
+from C_BeamResults import *
+from C_NodalResults import *
+from C_ContinuumResults import *
+from C_NodalResults import *
+from ExcelUtl import *
+from C_Diagram import *
+
+
+# ==========================================================
+def beam_MNT_from_continuum_3D (zsoil_data, out_png):
+# ==========================================================
+    # goal:
+    # this function will plot bending moment integrated from stresses in continuum elements 2D
+    #
+    # zsoil_data     - name of the project (without file extension !)
+    # real_time      - time at which the
+    # out_png        - name of the resulting png file
+    # ------------------------------------------------------------------
+
+    # ------------------------------------------------------------------
+    #next 3 calls must always be done to be able to analyze ZSOIL results
+    # (1) launch history of execution for this project
+    his = HistoryOfExecution (data_file)
+
+    # (2) read mesh from *.dat file
+    mesh = Mesh (data_file)
+
+    # (3) read configuration file on how the element and nodal results are stored in external binary files
+    rcf = RCF_info (data_file)
+    # ------------------------------------------------------------------
+
+    #take all time instances
+    solution_indices = his.give_converged_time_solutions()
+
+    # create instance of diagram class which will contain plot contact stresses
+    dg = Diagram()
+    dg.set_figure_size((12, 12))
+
+    zoom = [[], [], []]
+    zoom_filter = [mesh.ZOOM_FILTER_ENOUGH_ONE_NODE_IS_IN, zoom]
+
+    cont_rsl = Continuum_EleResults(mesh, his, rcf)
+    mat_filter = [1]
+    sel_elements = mesh.get_list_of_elements(Element.GROUP_CONTINUUM, \
+                                             0.0, False, mat_filter=mat_filter, \
+                                             ele_class_filter=[], zoom_filter=zoom_filter)
+
+    x_dir = np.array([1.0, 0.0, 0.0]) # direction of beam X-axis
+    pt    = np.array([0.0, 0.5, 0.25]) # starting central point of the beam cross section
+    y_dir = np.array([0.0, 1.0, 0.0]) # local beam Y-axis
+
+    #here we will get {NX, QY, QZ, MX, MY, MZ} at center of each elements layer along given drection and for each time instance --> array [n_ele_layrs,n_time_instances,6]
+    statusOK, x_tab, x_size, Forces = cont_rsl.get_MNQ_time_history_for_fict_uniform_beam( \
+        sel_elements, solution_indices, \
+        pt, x_dir, y_dir)
+
+    # postprocess the above result to have it along full beam length including starting and end cross sections
+    x_tab_ex, Forces_ex = postprocess_MNQ_time_history_for_fict_uniform_beam(Forces, x_tab, x_size)
+
+    # smooth bending moment diagram Mz
+    smooth_jumps_in_stress_resultant_time_history(Forces_ex, 5)
+
+
+    markers = dg.get_markers(2)
+    colors  = dg.get_colors (2)
+
+    label = ''
+    i = 0
+    times = his.get_data_value_for_sol_instances (solution_indices,his.DATA_TIME)
+    for sol_index in range (len(solution_indices)):
+        time = times [sol_index]
+        label = "Mz("+str(time)+")"
+        dg.add_plot (x_tab_ex, Forces_ex [:,sol_index,5] ,marker_=markers [i], markevery_=1, markersize_=3, \
+                     markerfacecolor_=colors[i], markeredgecolor_='black', \
+                     linestyle_='-',label_= label, color_=colors[i])
+
+    i = 1
+    for sol_index in range (len(solution_indices)):
+        time = times [sol_index]
+        label = "My("+str(time)+")"
+        dg.add_plot (x_tab_ex, Forces_ex [:,sol_index,4] ,marker_=markers [i], markevery_=1, markersize_=3, \
+                     markerfacecolor_=colors[i], markeredgecolor_='black', \
+                     linestyle_='-',label_= label, color_=colors[i])
+
+    #to make envelopes see tutorial tut-integ-MNT-from-continuum-3D
+    #it works in the same manner
+
+
+    # dg.set_x_axes_tick_params (labelsize=16)
+    # dg.set_x_min   ( 30.0)
+    # dg.set_x_max   (120.0)
+    # dg.set_y_max   (  0.0)
+    # dg.set_y_min   (-20.0)
+    # #dg.set_x_log_scale ()
+
+    dg.set_x_label (r'$x$ [m]')
+    dg.set_y_label (r'$Mz$ [kNm]')
+    dg.add_grid         ()
+    dg.add_legend       ()
+    dg.save_fig(out_png)
+
+
+if __name__ == '__main__':
+    data_file = "..\\tests\continuum-MNT\\beam-3D"
+    plots_dir = "..\\tutorials\\plots-tut-integ-MNT-from-continuum-3D\\"
+
+    beam_MNT_from_continuum_3D (data_file, plots_dir+"beam_MNT_from_continuum_3D.png")
+
+    pyplot.show ()
