@@ -1,19 +1,32 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=61.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "zsoil-output"
 version = "0.1.0"
-description = "Read ZSoil FEM result files (mesh, history of execution, nodal/element/beam/shell/contact results) from Python."
+authors = [
+    { name="GeoDev Sarl", email="support@zsoil.com" }
+]
+description = "Read ZSoil FEM results files (mesh, history of execution, nodal/element/beam/shell/contact results) in Python."
 readme = "README.md"
 requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
 dependencies = [
     "numpy",
     "matplotlib",
     "xlrd",
     "xlwt",
 ]
+
+[project.urls]
+GitHub = "https://github.com/ZSoil-FEM/zsoil-output"
+ZSoilHomepage = "https://zsoil.com/"
 
 [tool.setuptools.packages.find]
 where = ["src"] # Explicitly binds "import zsoil_output" to your src directory
