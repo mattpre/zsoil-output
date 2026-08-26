@@ -2,9 +2,9 @@ import os
 import os
 import numpy as np
 
-from C_EleResults     import *
-from C_Element_s_beam_L2 import *
-from C_PlasticCodes   import *
+from .C_EleResults     import *
+from .C_Element_s_beam_L2 import *
+from .C_PlasticCodes   import *
 
 #class to get results for Spacone's beam with 5 integration points
 

@@ -1,6 +1,6 @@
 
-from C_Element            import *
-from C_Element_T3_generic import *
+from .C_Element            import *
+from .C_Element_T3_generic import *
 
 #=====================================================
 class Element_shell_T3 (Element):

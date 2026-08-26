@@ -1,9 +1,9 @@
 import os
 import numpy as np
 
-from C_EleResults       import *
-from C_Element_beam_L2  import *
-from C_PlasticCodes     import *
+from .C_EleResults       import *
+from .C_Element_beam_L2  import *
+from .C_PlasticCodes     import *
 
 #class to get results for standard beams with 1 gauss point
 

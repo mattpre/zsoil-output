@@ -18,13 +18,11 @@ import sys
 # Latex style axes descriptions, equations etc...
 #rc('text',usetex=True)
 
-sys.path.append ('..\\')
+# Only needed if you want to use a local clone of zsoil_output instead of the pip-installed package:
+# import sys
+# sys.path.insert(0, '..\\src')   # the folder that CONTAINS zsoil_output\
 
-from C_Mesh import *
-from C_HistoryOfExecution import *
-from C_Rcf_info import *
-from C_EleResults import *
-from C_Beam_S_Results import *
+from zsoil_output import Mesh, HistoryOfExecution, RCF_info, Beam_S_EleResults, Element
 
 
 

@@ -1,7 +1,7 @@
-from C_Material import *
-from C_Exf      import *
-from C_Element            import *
-from C_Element_Q4_generic import *
+from .C_Material import *
+from .C_Exf      import *
+from .C_Element            import *
+from .C_Element_Q4_generic import *
 import numpy as np
 
 #=====================================================

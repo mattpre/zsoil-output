@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.axes3d import get_test_data
 # This import registers the 3D projection, but is otherwise unused.
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
-from C_Diagram import *
+from .C_Diagram import *
 
 class Diagram3D (Diagram):
 

@@ -1,4 +1,4 @@
-from C_Element_Volumic_generic import *
+from .C_Element_Volumic_generic import *
 import numpy as np
 
 #=====================================================

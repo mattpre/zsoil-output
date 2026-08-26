@@ -22,18 +22,14 @@ from matplotlib import rc
 
 
 #path to SDK
-sys.path.append ('..\\')
+# Only needed if you want to use a local clone of zsoil_output instead of the pip-installed package:
+# import sys
+# sys.path.insert(0, '..\\src')   # the folder that CONTAINS zsoil_output\
 
-from C_Mesh import *
-from C_HistoryOfExecution import *
-from C_Rcf_info import *
-from C_EleResults import *
-from C_BeamResults import *
-from C_NodalResults import *
-from C_ContinuumResults import *
-from C_NodalResults import *
-from ExcelUtl import *
-from C_Diagram import *
+from zsoil_output import Mesh, HistoryOfExecution, RCF_info, Continuum_EleResults, Diagram, Element
+from zsoil_output.C_ContinuumResults import (postprocess_MNQ_time_history_for_fict_uniform_beam,
+                                              smooth_jumps_in_stress_resultant_time_history,
+                                              get_MNQ_envelopes_for_fict_uniform_beam)
 
 
 # ==========================================================

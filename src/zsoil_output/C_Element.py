@@ -1,8 +1,8 @@
-from C_Material import *
-from C_Exf      import *
-from C_Element_T3_generic import *
-from C_Element_Q4_generic import *
-from C_Element_L2D_generic import*
+from .C_Material import *
+from .C_Exf      import *
+from .C_Element_T3_generic import *
+from .C_Element_Q4_generic import *
+from .C_Element_L2D_generic import*
 # from numpy      import *
 import numpy    as np
 from math import *

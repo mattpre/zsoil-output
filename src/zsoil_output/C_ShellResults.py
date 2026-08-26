@@ -1,17 +1,17 @@
 import os
 import numpy as np
 
-from C_EleResults         import *
-from C_Element_shell_Q4   import *
-from C_Element_shell_T3   import *
-from C_Element_shell_SHQ4 import *
+from .C_EleResults         import *
+from .C_Element_shell_Q4   import *
+from .C_Element_shell_T3   import *
+from .C_Element_shell_SHQ4 import *
 #from C_PlasticCodes       import *
 
 #debug this class
-from C_Mesh import *
-from C_Rcf_info import *
-from C_HistoryOfExecution import *
-from C_ContinuumResults import *
+from .C_Mesh import *
+from .C_Rcf_info import *
+from .C_HistoryOfExecution import *
+from .C_ContinuumResults import *
 
 
 #class to get results for shell elements

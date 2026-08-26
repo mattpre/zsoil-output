@@ -1,4 +1,5 @@
 from .C_Mesh import Mesh
+from .C_Element import Element
 from .C_HistoryOfExecution import HistoryOfExecution
 from .C_Rcf_info import RCF_info
 from .C_Rcf_layers_info import RCF_layers_info
@@ -18,6 +19,7 @@ from .C_Heat_Exch_Results import Heat_Exch_Results
 
 __all__ = [
     "Mesh",
+    "Element",
     "HistoryOfExecution",
     "RCF_info",
     "RCF_layers_info",

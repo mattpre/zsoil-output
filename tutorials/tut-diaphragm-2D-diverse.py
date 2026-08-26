@@ -22,19 +22,12 @@ from matplotlib import rc
 
 
 #path to SDK
-sys.path.append ('..\\')
+# Only needed if you want to use a local clone of zsoil_output instead of the pip-installed package:
+# import sys
+# sys.path.insert(0, '..\\src')   # the folder that CONTAINS zsoil_output\
 
-from C_Mesh import *
-from C_HistoryOfExecution import *
-from C_Rcf_info import *
-from C_EleResults import *
-from C_BeamResults import *
-from C_NodalResults import *
-from C_ContinuumResults import *
-from C_NodalResults import *
-from ExcelUtl import *
-from C_Diagram import *
-from C_Contact_2D_Results import *
+from zsoil_output import (Mesh, HistoryOfExecution, RCF_info, Beam_EleResults,
+                           NodalResults, Continuum_EleResults, Diagram, Contact_2D_Results, Element)
 
 def CSV_reader (csv_name,separator,skip_nr_of_rows = 0):
     f = open (csv_name)

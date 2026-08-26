@@ -1,9 +1,9 @@
 import os
 import numpy as np
 
-from C_EleResults     import *
-from C_Element_truss_L2 import *
-from C_PlasticCodes   import *
+from .C_EleResults     import *
+from .C_Element_truss_L2 import *
+from .C_PlasticCodes   import *
 
 
 

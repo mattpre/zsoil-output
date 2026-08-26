@@ -1,14 +1,14 @@
 import os
 import numpy as np
 
-from C_EleResults         import *
-from C_Element_cnt_L2   import *
+from .C_EleResults         import *
+from .C_Element_cnt_L2   import *
 #from C_PlasticCodes       import *
 
 #debug this class
-from C_Mesh import *
-from C_Rcf_info import *
-from C_HistoryOfExecution import *
+from .C_Mesh import *
+from .C_Rcf_info import *
+from .C_HistoryOfExecution import *
 
 #class to get results from contact interface elements
 #=====================================================

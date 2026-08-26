@@ -1,23 +1,23 @@
 import os
 import numpy as np
 
-from C_EleResults         import *
-from C_Element_cont_Q4    import *
-from C_Element_cont_T3    import *
-from C_Element_cont_B8    import *
-from C_Element_cont_TH4   import *
-from C_Element_cont_W6    import *
-from C_NodalResults       import *
+from .C_EleResults         import *
+from .C_Element_cont_Q4    import *
+from .C_Element_cont_T3    import *
+from .C_Element_cont_B8    import *
+from .C_Element_cont_TH4   import *
+from .C_Element_cont_W6    import *
+from .C_NodalResults       import *
 
 #from C_PlasticCodes       import *
 
 #debug this class
-from C_Mesh import *
-from C_Rcf_info import *
-from C_HistoryOfExecution import *
-from C_math_utl import *
+from .C_Mesh import *
+from .C_Rcf_info import *
+from .C_HistoryOfExecution import *
+from .C_math_utl import *
 #debug
-from C_ShellResults import *
+from .C_ShellResults import *
 import pylab
 
 #class to get results for continuum 2D/3D elements

@@ -23,7 +23,7 @@
 # &x,e14.6,1x,i5,1x,i5,1x,e14.6,6(1x,e14.6),4(1x,e14.6))'
 
 import os
-from ZSoil_version import *
+from .ZSoil_version import *
 
 #=====================================================
 class HistoryOfExecution ():

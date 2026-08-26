@@ -1,7 +1,7 @@
 import os
 import numpy
 import numpy as np
-from C_Element import *
+from .C_Element import *
 
 
 #=====================================================

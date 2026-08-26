@@ -1,7 +1,7 @@
-from C_Material import *
-from C_Exf      import *
-from C_Element  import *
-from C_Element_T3_generic import *
+from .C_Material import *
+from .C_Exf      import *
+from .C_Element  import *
+from .C_Element_T3_generic import *
 
 
 #=====================================================
