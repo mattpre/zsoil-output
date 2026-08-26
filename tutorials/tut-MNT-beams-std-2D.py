@@ -12,7 +12,7 @@
 #-------------------------------------------------------------------------------
 
 import os
-import numpy
+import numpy as np
 import sys
 # those who have installed miktex environment can deactivate the next statement to have nice
 # Latex style axes descriptions, equations etc...

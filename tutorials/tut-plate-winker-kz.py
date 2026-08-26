@@ -23,7 +23,7 @@ import sys
 
 from zsoil_output import Mesh, HistoryOfExecution, RCF_info, NodalResults, Continuum_EleResults, Element
 
-import numpy
+import numpy as np
 
 import pylab
 from scipy.interpolate import griddata
@@ -101,8 +101,8 @@ def make_color_contour_kz (mesh,his,rcf,solution_index_ref,solution_index_curr, 
     axes   = fig.add_subplot(1,1,1)
     #pyplot.subplots_adjust(left=0.17, bottom=0.1, right=0.95, top=0.85, hspace = 0.05) #RO
     #
-    xi = numpy.linspace(xmin,xmax,50)
-    yi = numpy.linspace(ymin,ymax,50)
+    xi = np.linspace(xmin,xmax,50)
+    yi = np.linspace(ymin,ymax,50)
     # # grid the data.
     zi_max = griddata((x, y), kz, (xi[None,:], yi[:,None]), method='linear')
     # # contour the gridded data, plotting dots at the randomly spaced data points.

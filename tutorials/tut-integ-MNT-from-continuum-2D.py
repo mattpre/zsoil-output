@@ -11,6 +11,7 @@
 import matplotlib.pyplot  as pyplot
 import matplotlib.pylab   as pylab
 from math import *
+import numpy as np
 import xlwt
 import sys,os
 

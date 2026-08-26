@@ -728,7 +728,7 @@ def Wall_eff_stresses_in_soil (zsoil_data, real_time, out_png):
 
 
 if __name__ == '__main__':
-    data_file = "..\\tests\diaphragm-wall\\HS-Brick-Exc-Berlin-Sand-2phase"
+    data_file = "..\\tests\\diaphragm-wall\\HS-Brick-Exc-Berlin-Sand-2phase"
     plots_dir = "..\\tutorials\\plots-tut-diaphragm-2D-diverse\\"
     his = HistoryOfExecution (data_file)
     list_of_solution_indices = his.give_converged_time_solutions()
