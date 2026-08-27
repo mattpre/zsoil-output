@@ -12,6 +12,10 @@ installable as a regular Python package.
 ## Install
 
 ```bash
+pip install zsoil-output
+```
+or
+```bash
 pip install git+https://github.com/ZSoil-FEM/zsoil-output.git
 ```
 
