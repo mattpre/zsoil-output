@@ -2,6 +2,7 @@ import os
 import numpy
 import numpy as np
 from   math import *
+from .C_RslFileCache import RslFileCache
 
 
 #=====================================================
@@ -17,6 +18,7 @@ class NodalResults ():
 
         self.dict_exts          = {"NODAL_RSL":".s00","NODAL_RES":".r00","NODAL_VEL":".v00","NODAL_ACC":".a00"}
         self.dict_node_size_int = {"NODAL_RSL":rcf.give_one_node_size(),"NODAL_RES":rcf.give_one_node_size(),"NODAL_VEL":rcf.give_one_node_size_v(),"NODAL_ACC":rcf.give_one_node_size_a()}
+        self.rsl_files = RslFileCache ()
 
     #======================================
     def get_nodal_results (self,selected_nodes,solution_indices,dict_key):
@@ -30,23 +32,35 @@ class NodalResults ():
         if len(selected_nodes) <= 0:
             return out
 
+        node_size_int= self.dict_node_size_int[dict_key]
+        node_indices_1 = [node.index for node in selected_nodes]
+        data = self._read_nodal_records (node_indices_1,solution_indices,dict_key)
+        data = data.reshape (len(selected_nodes),len(solution_indices)*node_size_int)
+
+        for k in range (len(selected_nodes)):
+            node_rsl = [node_indices_1[k]]
+            node_rsl.extend (data [k])
+            out.append (node_rsl)
+        return out
+
+    #======================================
+    def _read_nodal_records (self,node_indices_1,solution_indices,dict_key):
+    #======================================
+        # returns float32 array of shape (len(node_indices_1),len(solution_indices),node_size_int)
         rsl_file_ext = self.dict_exts [dict_key]
         node_size_int= self.dict_node_size_int[dict_key]
+        n_nodes = len(self.mesh.nodes)
+        rows = np.asarray (node_indices_1,dtype=np.int64) - 1
+        sol_offs = np.asarray (solution_indices,dtype=np.int64) * n_nodes
+        rec_indices = rows[:,None] + sol_offs[None,:]
+        data = self.rsl_files.read_records (self.mesh.my_project+rsl_file_ext,node_size_int,rec_indices.ravel())
+        return data.reshape (len(node_indices_1),len(solution_indices),node_size_int)
 
-        f      = open (mesh.my_project+rsl_file_ext,"rb")
-        node_size     = node_size_int * 4 #in bytes
-
-        for node in selected_nodes:
-            node_rsl = [node.index]
-            for sol_index in solution_indices:
-                seek_pos = sol_index * len(mesh.nodes) * node_size + (node.index-1) * node_size
-                f.seek    (seek_pos,os.SEEK_SET)  # seek
-                arr = numpy.fromfile (f,dtype=numpy.float32,count=node_size_int,sep="")  # read the data into numpy
-                for i in range(len(arr)):
-                    node_rsl.append ( arr [i] )
-            out.append (node_rsl)
-        f.close ()
-        return out
+    #======================================
+    def close (self):
+    #======================================
+        # releases the result files kept open for fast repeated reads
+        self.rsl_files.close ()
 
 
 
@@ -123,17 +137,24 @@ class NodalResults ():
         # comp is one of 'X', 'Y', 'Z'; if None take full vector
         # this functions returns numpy array of size (nr_time_instances,3) when comp==None
         # this functions returns numpy array of size (nr_time_instances) when comp != None
-        solution_indices = [solution_index]
         if comp == None:
             ret = np.zeros(len(node_indices_1) * 3).reshape (len(node_indices_1),3)
+            cols = [self.rcf.give_col_for_nod_rsl(rsl_key, c)[0] for c in ['X', 'Y', 'Z']]
         else:
             ret = np.zeros(len(node_indices_1))
+            cols = [self.rcf.give_col_for_nod_rsl(rsl_key, comp)[0]]
+        if len(node_indices_1) <= 0:
+            return ret
 
-        row = 0
-        for node_index_1 in node_indices_1:
-            out = self._get_node_vectorial_rsl_ths(node_index_1, solution_indices, dict_key, rsl_key, comp)
-            ret[row] = out[0]
-            row = row + 1
+        node_indices = [self.mesh.get_node(i).index for i in node_indices_1]
+        data = self._read_nodal_records (node_indices,[solution_index],dict_key)[:,0,:]
+
+        for k in range(len(cols)):
+            if cols[k] != -1:
+                if comp == None:
+                    ret[:,k] = data[:,cols[k]]
+                else:
+                    ret[:] = data[:,cols[k]]
 
         return ret
 
@@ -145,14 +166,14 @@ class NodalResults ():
         # node_index_1 starts from 1
         # solution indices are verified in class HistoryOfExecution, from there import time instances or other quantities
         # this functions returns numpy array of size (nr_time_instances)
-        solution_indices = [solution_index]
         ret = np.zeros(len(node_indices_1))
+        col, n_comps = self.rcf.give_col_for_nod_rsl(rsl_key, '')
+        if len(node_indices_1) <= 0 or col == -1:
+            return ret
 
-        row = 0
-        for node_index_1 in node_indices_1:
-            out = self._get_node_scalar_rsl_ths (node_index_1, solution_indices,dict_key, rsl_key)
-            ret[row] = out[0]
-            row = row + 1
+        node_indices = [self.mesh.get_node(i).index for i in node_indices_1]
+        data = self._read_nodal_records (node_indices,[solution_index],dict_key)[:,0,:]
+        ret[:] = data[:,col]
 
         return ret
 
@@ -383,32 +404,17 @@ class NodalResults ():
         out_max = np.zeros(len(node_indices_1) * 4).reshape(len(node_indices_1),4)
         out_min = np.zeros(len(node_indices_1) * 4).reshape(len(node_indices_1),4)
         aux     = np.zeros(len(node_indices_1) * 4).reshape(len(node_indices_1),4)
-        vecComps = ['X', 'Y', 'Z','ABS']
 
-        vec = np.zeros (4)
         for solution_index in solution_indices:
             vecx = self._get_nodes_vectorial_rsl(node_indices_1, solution_index, dict_key, rsl_key)
-            for i in range(len(node_indices_1)):
-                tmp = 0.0
-                for k in range (3):
-                    vec [k] = vecx [i][k]
-                    tmp = tmp + vec [k] * vec [k]
-                tmp = sqrt(tmp)
-                vec [3] = tmp
-                aux [i] = vec
+            aux[:,0:3] = vecx
+            aux[:,3] = np.sqrt(vecx[:,0] * vecx[:,0] + vecx[:,1] * vecx[:,1] + vecx[:,2] * vecx[:,2])
 
-            for i in range(len(node_indices_1)):
-                if aux[i][comp_index_4] > out_max[i][comp_index_4]:
-                    out_max[i][comp_index_4] = aux[i][comp_index_4]
-                    for k in range(4):
-                        if k != comp_index_4:
-                            out_max[i][k] = aux[i][k]
-
-                if aux[i][comp_index_4] < out_min[i][comp_index_4]:
-                    out_min [i][comp_index_4] = aux[i][comp_index_4]
-                    for k in range(4):
-                        if k != comp_index_4:
-                            out_min [i][k] = aux[i][k]
+            # keep the whole row (corresponding components) where the envelope component is exceeded
+            mask = aux[:,comp_index_4] > out_max[:,comp_index_4]
+            out_max[mask] = aux[mask]
+            mask = aux[:,comp_index_4] < out_min[:,comp_index_4]
+            out_min[mask] = aux[mask]
 
         return out_min, out_max
 
@@ -421,12 +427,8 @@ class NodalResults ():
 
         for solution_index in solution_indices:
             aux = self._get_nodes_scalar_rsl(node_indices_1, solution_index, dict_key, rsl_key)
-
-            for i in range(len(node_indices_1)):
-                if aux[i] > out_max[i]:
-                    out_max [i] = aux[i]
-                if aux[i] < out_min[i]:
-                    out_min [i] = aux[i]
+            out_max = np.where(aux > out_max, aux, out_max)
+            out_min = np.where(aux < out_min, aux, out_min)
         return out_min, out_max
 
 
